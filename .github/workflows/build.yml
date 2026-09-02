@@ -1,0 +1,39 @@
+name: Build Windows ARM64 patched Codex
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_commit:
+        description: Exact 40-hex CSA-codex source commit
+        required: true
+        type: string
+      compat_id:
+        description: Exact compatibility ID
+        required: true
+        type: string
+      request_id:
+        description: Unique central build request ID
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: build-${{ inputs.request_id }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    permissions:
+      contents: read
+    uses: DSLZL/CSA-codex/.github/workflows/build-patched-codex-target.yml@c7e3a6ca8a14f13d5341ca5e4c702d212c3e16dc
+    with:
+      builder_repository: DSLZL/CSA-codex-windows-arm64
+      cache_mode: read-write
+      compat_id: ${{ inputs.compat_id }}
+      request_id: ${{ inputs.request_id }}
+      retention_days: 1
+      runner: windows-11-arm
+      source_commit: ${{ inputs.source_commit }}
+      target: aarch64-pc-windows-msvc
